@@ -1,0 +1,122 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mod Details - ZENO MODS</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <header class="app-header detail-header">
+    <button onclick="window.location.href='index.html'" class="back-btn">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <h2 id="headerTitle">Loading Mod...</h2>
+  </header>
+
+  <main class="content-wrapper detail-wrapper">
+    
+    <div class="detail-identity" id="modIdentity">
+      </div>
+
+    <div class="specs-panel" id="modSpecs">
+      </div>
+
+    <div class="action-tools">
+      <button class="tool-btn" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+      <button class="tool-btn" id="copyBtn"><i class="fa-solid fa-link"></i> Copy Link</button>
+    </div>
+
+    <section class="detail-section">
+      <h3>Screenshots</h3>
+      <div class="screenshot-slider" id="screenshotSlider"></div>
+    </section>
+
+    <section class="detail-section">
+      <h3>Description</h3>
+      <p class="text-block" id="modDescription"></p>
+    </section>
+
+    <section class="detail-section">
+      <h3>What's New (Changelog)</h3>
+      <pre class="text-block changelog-block" id="modChangelog"></pre>
+    </section>
+
+    <div class="download-footer">
+      <button id="mainDownloadBtn" class="primary-download-btn">
+        <i class="fa-solid fa-circle-arrow-down"></i> Download via MediaFire
+      </button>
+    </div>
+
+  </main>
+
+  <script src="apps.js"></script>
+  <script>
+    // App Details Page Logic Engine
+    const urlParams = new URLSearchParams(window.location.search);
+    const modId = parseInt(urlParams.get('id'));
+    const mod = modsData.find(item => item.id === modId);
+
+    if (!mod) {
+      document.body.innerHTML = "<div class='error-view'><h2>Mod not found!</h2><a href='index.html'>Go Home</a></div>";
+    } else {
+      document.getElementById('headerTitle').innerText = mod.category;
+      
+      document.getElementById('modIdentity').innerHTML = `
+        <img src="${mod.image}" alt="${mod.title}" class="detail-icon">
+        <div class="identity-info">
+          <h2>${mod.title}</h2>
+          <p class="developer-tag">Verified Mod By ZENO MODS</p>
+        </div>
+      `;
+
+      document.getElementById('modSpecs').innerHTML = `
+        <div class="spec-item"><i class="fa-solid fa-weight-hanging"></i> <span>${mod.size}</span></div>
+        <div class="spec-item"><i class="fa-solid fa-code-branch"></i> <span>${mod.version}</span></div>
+        <div class="spec-item"><i class="fa-solid fa-download"></i> <span id="localCount">${mod.downloads}</span></div>
+        <div class="spec-item"><i class="fa-solid fa-calendar"></i> <span>${mod.releaseDate}</span></div>
+      `;
+
+      document.getElementById('modDescription').innerText = mod.description;
+      document.getElementById('modChangelog').innerText = mod.changelog || "No recent updates noted.";
+
+      // Load Screenshots
+      const slider = document.getElementById('screenshotSlider');
+      if (mod.screenshots && mod.screenshots.length > 0) {
+        mod.screenshots.forEach(src => {
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = "Screenshot";
+          slider.appendChild(img);
+        });
+      } else {
+        slider.innerHTML = `<p class='no-data'>No screenshots provided.</p>`;
+      }
+
+      // Download Action Execution
+      document.getElementById('mainDownloadBtn').addEventListener('click', () => {
+        // Increment structural session counter mockup
+        mod.downloads++;
+        document.getElementById('localCount').innerText = mod.downloads;
+        window.open(mod.mediafire, '_blank');
+      });
+
+      // Actions Event Listeners
+      document.getElementById('copyBtn').addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Mod Share Link successfully copied to clipboard!');
+      });
+
+      document.getElementById('shareBtn').addEventListener('click', () => {
+        if(navigator.share) {
+          navigator.share({ title: mod.title, url: window.location.href });
+        } else {
+          alert(`Share this link: ${window.location.href}`);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
